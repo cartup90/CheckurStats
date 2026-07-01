@@ -360,6 +360,21 @@ export default function Stats() {
                   </ResponsiveContainer>
                 </div>
 
+                <div className={styles.chartCard}>
+                  <h3>Cantidad de puntos por golpe</h3>
+                  <ResponsiveContainer width="100%" height={Math.max(200, shotStats.length * 36)}>
+                    <BarChart data={shotStats} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                      <XAxis type="number" tick={{ fill: '#64748b', fontSize: 10 }} />
+                      <YAxis dataKey="name" type="category" tick={{ fill: '#94a3b8', fontSize: 10 }} width={70} />
+                      <Tooltip contentStyle={{ background: '#1a2335', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#f1f5f9' }} />
+                      <Bar dataKey="winners" name="Winner" fill="#10b981" stackId="a" />
+                      <Bar dataKey="errForzado" name="Err. forzado" fill="#f59e0b" stackId="a" />
+                      <Bar dataKey="errNoForzado" name="Err. no forz." fill="#ef4444" stackId="a" radius={[0,4,4,0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
                 <div className={styles.shotTable}>
                   <div className={styles.shotTableHeader}>
                     <span>Golpe</span><span>Total</span>
