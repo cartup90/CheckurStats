@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="96" fill="#0a0f1a"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#00d4a0" stroke-width="24"/>
+  <ellipse cx="256" cy="256" rx="60" ry="180" fill="none" stroke="#00d4a0" stroke-width="16"/>
+  <line x1="76" y1="256" x2="436" y2="256" stroke="#00d4a0" stroke-width="16"/>
+  <line x1="256" y1="76" x2="256" y2="436" stroke="#00d4a0" stroke-width="10" stroke-dasharray="20 14"/>
+  <circle cx="256" cy="256" r="28" fill="#00d4a0"/>
+  <text x="256" y="490" text-anchor="middle" font-family="Inter,sans-serif" font-size="64" font-weight="900" fill="#00d4a0" opacity="0.6">PS</text>
+</svg>

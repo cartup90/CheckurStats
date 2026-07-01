@@ -1,0 +1,102 @@
+.page { display: flex; flex-direction: column; min-height: 100dvh; max-width: 480px; margin: 0 auto; }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-3);
+}
+
+.back {
+  font-size: 1.2rem;
+  color: var(--color-text-2);
+  padding: var(--space-2);
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+}
+.back:active { background: var(--color-surface-2); }
+
+.main { flex: 1; padding: var(--space-4); }
+
+.list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.playerCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  animation: fadeIn 250ms ease both;
+}
+.playerCard:active { background: var(--color-surface-2); }
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent-dim), var(--color-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.info { flex: 1; overflow: hidden; }
+.name { font-weight: 600; font-size: var(--text-base); }
+.sub  { font-size: var(--text-xs); color: var(--color-text-3); margin-top: 2px; }
+
+.deleteBtn {
+  color: var(--color-text-3);
+  padding: var(--space-2);
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+.deleteBtn:active { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  text-align: center;
+  gap: var(--space-3);
+}
+.emptyIcon { font-size: 2.5rem; }
+
+.form { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form label span {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-2);
+}
+
+.formActions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}

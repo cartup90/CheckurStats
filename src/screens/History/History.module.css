@@ -1,0 +1,87 @@
+.page { display: flex; flex-direction: column; min-height: 100dvh; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  z-index: 10;
+}
+
+.back { font-size: 1.2rem; color: var(--color-text-2); padding: var(--space-2); min-width: 40px; min-height: 40px; display: flex; align-items: center; border-radius: var(--radius-sm); }
+.back:active { background: var(--color-surface-2); }
+
+.count { margin-left: auto; font-size: var(--text-xs); color: var(--color-text-3); font-weight: 600; background: var(--color-surface); padding: 3px 10px; border-radius: var(--radius-full); border: 1px solid var(--color-border); }
+
+.main { flex: 1; padding: var(--space-4); overflow-y: auto; }
+
+.list { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.pointCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  animation: fadeIn 200ms ease both;
+}
+.pointCard:active { background: var(--color-surface-2); }
+
+.flagged { border-left: 3px solid #f59e0b; }
+
+.pointNum { font-size: var(--text-xs); color: var(--color-text-3); font-weight: 700; min-width: 22px; text-align: center; }
+
+.teamDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.team1 { background: var(--color-team1); }
+.team2 { background: var(--color-team2); }
+
+.pointInfo { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+.pointTop { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+
+.playerName { font-size: var(--text-sm); font-weight: 700; }
+.text1 { color: var(--color-team1); }
+.text2 { color: var(--color-team2); }
+
+.pointScore { font-size: var(--text-xs); color: var(--color-text-3); font-weight: 600; }
+
+.pointBottom { display: flex; align-items: center; gap: var(--space-2); }
+
+.shotChip { font-size: var(--text-xs); color: var(--color-text-2); }
+.resultChip { font-size: var(--text-xs); font-weight: 700; }
+
+.nota { font-size: var(--text-xs); color: var(--color-text-3); font-style: italic; }
+
+.pointActions { display: flex; flex-direction: column; gap: 4px; }
+
+.actionBtn {
+  font-size: 0.85rem;
+  color: var(--color-text-3);
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+.actionBtn:active { background: var(--color-surface-2); }
+.revisar { color: #f59e0b; }
+
+.empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-12); text-align: center; font-size: 2rem; }
+
+.editForm { display: flex; flex-direction: column; gap: var(--space-4); }
+.editForm label { display: flex; flex-direction: column; gap: var(--space-2); }
+.editForm label span { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-2); }
+
+.checkLabel { flex-direction: row !important; align-items: center !important; gap: var(--space-3) !important; }
+.checkLabel input { width: auto; }
+
+.editActions { display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-2); }

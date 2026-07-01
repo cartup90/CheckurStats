@@ -1,0 +1,68 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all var(--transition-fast);
+  min-height: var(--touch-min);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.sm { padding: 0.4rem 0.9rem; font-size: var(--text-sm); min-height: 36px; }
+.md { padding: 0.65rem 1.2rem; font-size: var(--text-base); }
+.lg { padding: 0.85rem 1.6rem; font-size: var(--text-lg); }
+.xl { padding: 1rem 2rem; font-size: var(--text-xl); }
+
+/* Variants */
+.primary {
+  background: var(--color-accent);
+  color: #000;
+}
+.primary:active { background: var(--color-accent-dim); transform: scale(0.97); }
+
+.secondary {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+}
+.secondary:active { background: var(--color-surface-3); transform: scale(0.97); }
+
+.ghost {
+  background: transparent;
+  color: var(--color-text-2);
+}
+.ghost:active { color: var(--color-text); background: var(--color-surface-2); }
+
+.danger {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+  border: 1.5px solid rgba(239,68,68,0.3);
+}
+.danger:active { background: rgba(239,68,68,0.25); transform: scale(0.97); }
+
+.team1 {
+  background: var(--color-team1-dim);
+  color: var(--color-team1);
+  border: 1.5px solid rgba(59,130,246,0.4);
+}
+.team1:active { background: rgba(59,130,246,0.35); transform: scale(0.97); }
+
+.team2 {
+  background: var(--color-team2-dim);
+  color: var(--color-team2);
+  border: 1.5px solid rgba(245,158,11,0.4);
+}
+.team2:active { background: rgba(245,158,11,0.35); transform: scale(0.97); }
+
+.fullWidth { width: 100%; }

@@ -1,0 +1,328 @@
+/* ── Modal overlay ──────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 88dvh;
+  background: var(--color-bg);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes slideUp { from { transform: translateY(60px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.modalAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.avatar1 { background: var(--color-team1); }
+.avatar2 { background: var(--color-team2); }
+
+.modalTitleBlock { flex: 1; min-width: 0; }
+.modalName { font-size: var(--text-lg); font-weight: 800; margin: 0; }
+.modalMeta { display: flex; align-items: center; gap: var(--space-2); margin-top: 4px; }
+.posTag { font-size: var(--text-xs); color: var(--color-text-3); }
+
+.modalClose {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-3);
+  font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.modalClose:active { background: var(--color-surface); }
+
+.modalBody {
+  overflow-y: auto;
+  flex: 1;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* KPI grid */
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.kpi {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-2);
+  text-align: center;
+}
+
+.kpiAccent {
+  border-color: rgba(0,212,160,0.3);
+  background: rgba(0,212,160,0.05);
+}
+
+.kpiNum { font-size: var(--text-2xl); font-weight: 900; line-height: 1.1; }
+.kpiLabel { font-size: 0.6rem; color: var(--color-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
+/* Modal section */
+.modalSection { display: flex; flex-direction: column; gap: var(--space-3); }
+.sectionTitle { font-size: var(--text-sm); font-weight: 700; color: var(--color-text-2); margin: 0; }
+
+/* Shot detail table inside modal */
+.shotDetailTable {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.shotDetailHeader {
+  display: grid;
+  grid-template-columns: 1fr 28px 28px 28px 28px 36px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  gap: var(--space-1);
+}
+
+.shotDetailRow {
+  display: grid;
+  grid-template-columns: 1fr 28px 28px 28px 28px 36px;
+  padding: 6px var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  gap: var(--space-1);
+  align-items: center;
+}
+.shotDetailRow:last-child { border-bottom: none; }
+
+/* Tap hint */
+.tapHint {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+  text-align: center;
+  margin: 0;
+}
+
+/* Chevron on player cards */
+.chevron {
+  font-size: 1.4rem;
+  color: var(--color-text-3);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ── Page ───────────────────────────────────────────── */
+.page { display: flex; flex-direction: column; min-height: 100dvh; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  z-index: 10;
+}
+
+.back { font-size: 1.2rem; color: var(--color-text-2); padding: var(--space-2); min-width: 40px; min-height: 40px; display: flex; align-items: center; border-radius: var(--radius-sm); }
+.back:active { background: var(--color-surface-2); }
+
+.exportBtn { margin-left: auto; font-size: 1.3rem; padding: var(--space-2); min-width: 40px; min-height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); color: var(--color-text-2); }
+.exportBtn:active { background: var(--color-surface-2); }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tabBtn {
+  flex: 1;
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-3);
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.tabActive {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.main { flex: 1; overflow-y: auto; }
+
+.content { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* Summary cards */
+.summaryCards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+
+.summaryCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.card1 { border-color: rgba(59,130,246,0.3); }
+.card2 { border-color: rgba(245,158,11,0.3); }
+
+.summaryNum { font-size: var(--text-2xl); font-weight: 900; }
+.summaryLabel { font-size: 0.6rem; color: var(--color-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.card1 .summaryNum { color: var(--color-team1); }
+.card2 .summaryNum { color: var(--color-team2); }
+
+/* Chart card */
+.chartCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.chartCard h3 { font-size: var(--text-sm); font-weight: 700; margin-bottom: var(--space-3); color: var(--color-text-2); }
+
+/* Shot table */
+.shotTable {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.shotTableHeader {
+  display: grid;
+  grid-template-columns: 1fr 40px 44px 44px 44px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  gap: var(--space-2);
+}
+
+.shotRow {
+  display: grid;
+  grid-template-columns: 1fr 40px 44px 44px 44px;
+  padding: var(--space-3) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.shotRow:last-child { border-bottom: none; }
+.shotTotal { font-weight: 700; color: var(--color-text); }
+
+/* Player stat cards */
+.playerStatCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border-left-width: 3px;
+  /* reset button */
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.playerStatCard:hover { background: var(--color-surface-2); }
+.playerStatCard:active { transform: scale(0.99); }
+
+.border1 { border-left-color: var(--color-team1); }
+.border2 { border-left-color: var(--color-team2); }
+
+.playerStatHeader { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
+
+.playerAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.avatar1 { background: var(--color-team1); }
+.avatar2 { background: var(--color-team2); }
+
+.playerStatName { font-weight: 700; font-size: var(--text-base); }
+.playerStatSub { display: flex; align-items: center; gap: var(--space-2); margin-top: 2px; }
+.posText { font-size: var(--text-xs); color: var(--color-text-3); }
+
+.playerStatRight { margin-left: auto; text-align: right; }
+.efectividadNum { font-size: var(--text-2xl); font-weight: 900; color: var(--color-accent); }
+.efectividadLabel { font-size: var(--text-xs); color: var(--color-text-3); }
+
+.playerStatGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+
+.statItem { text-align: center; background: var(--color-surface-2); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-1); }
+.statNum { font-size: var(--text-xl); font-weight: 800; }
+.statLabel { font-size: 0.6rem; color: var(--color-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+
+.empty { text-align: center; color: var(--color-text-3); padding: var(--space-12); }
+
+.loading { display: flex; align-items: center; justify-content: center; min-height: 100dvh; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--color-border); border-top-color: var(--color-accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
