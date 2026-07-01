@@ -56,7 +56,7 @@ export function pointsToDisplay(p1, p2, formato) {
 
   // STAR POINT: a partir del 3er deuce se juega punto de oro
   const deuces = Math.min(p1, p2) - 3
-  if (formato?.starPoint && deuces >= 3) {
+  if (formato?.starPoint && deuces >= 2) {
     return { t1: 'STAR', t2: 'STAR' }
   }
 
@@ -94,7 +94,7 @@ function applyPointToGame(p1, p2, team, formato) {
   // Star point: a partir del 3er deuce → punto de oro
   if (formato?.starPoint) {
     const deuces = Math.min(np1, np2) - 3
-    if (deuces >= 3) {
+    if (deuces >= 2) {
       if (np1 > np2) return { np1, np2, gameWinner: 1 }
       if (np2 > np1) return { np1, np2, gameWinner: 2 }
       return { np1, np2, gameWinner: null }
