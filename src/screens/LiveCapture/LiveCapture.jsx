@@ -25,8 +25,13 @@ export default function LiveCapture() {
   const [finished,  setFinished]  = useState(false)
 
   // topTeam: which team number (1 or 2) is shown at the TOP of the court & scoreboard.
-  // Default: E2 on top, E1 on bottom (as established by user)
   const [topTeam, setTopTeam] = useState(2)
+
+  // Sacador tracking
+  const [showSacadorModal, setShowSacadorModal] = useState(false)
+  const [equipoSacadorInicial, setEquipoSacadorInicial] = useState(null)
+  // gameNumber: número de game completados hasta ahora en el partido (para tracking de BP)
+  const [gameNumber, setGameNumber] = useState(0)
 
   useEffect(() => { load() }, [matchId])
 
@@ -38,6 +43,29 @@ export default function LiveCapture() {
     setGameState(state)
     setHistoryArr(state?.history || [])
     if (m.estado === 'finalizado') setFinished(true)
+
+    // Calcular gameNumber actual contando los games completados desde los puntos guardados
+    const pts = await db.points.where('matchId').equals(matchId).sortBy('timestamp')
+    if (pts.length > 0) {
+      const maxGame = pts.reduce((max, p) => Math.max(max, p.gameNumber ?? 0), 0)
+      // Si el último punto tiene gameNumber, usarlo; si no, reconstruir
+      const lastPt = pts[pts.length - 1]
+      setGameNumber(lastPt.gameNumber ?? maxGame)
+    }
+
+    // Sacador
+    if (m.equipoSacadorInicial) {
+      setEquipoSacadorInicial(m.equipoSacadorInicial)
+    } else if (m.estado === 'en_curso' || !m.matchState) {
+      // Solo pedir sacador si el partido no tiene puntos aún
+      if (!pts.length) setShowSacadorModal(true)
+    }
+  }
+
+  async function handleSelectSacador(team) {
+    setEquipoSacadorInicial(team)
+    setShowSacadorModal(false)
+    await db.matches.update(matchId, { equipoSacadorInicial: team })
   }
 
   function handlePlayerTap(player) {
@@ -65,13 +93,22 @@ export default function LiveCapture() {
     if (!selectedPlayer || !selectedShot || !gameState) return
 
     const playerTeam = selectedPlayer.team
-    // Winner → punto para el equipo del jugador
-    // Error (forzado o no forzado) → punto para el equipo RIVAL
     const scoringTeam = result.id === 'winner' ? playerTeam : (playerTeam === 1 ? 2 : 1)
 
     const newState = applyPoint(gameState, scoringTeam)
     const history  = [...historyArr, JSON.parse(JSON.stringify({ ...gameState, history: [] }))]
     const score    = getScoreDisplay(newState)
+
+    // Detectar si se completó un game comparando games del set actual
+    const prevGames = gameState.currentSet.g1 + gameState.currentSet.g2
+    const newGames  = newState.currentSet.g1  + newState.currentSet.g2
+    // También puede haberse cerrado un set → comparar total de sets
+    const prevSets  = gameState.sets.length
+    const newSets   = newState.sets.length
+    const gameCompleted = newGames > prevGames || newSets > prevSets
+
+    const currentGameNumber = gameNumber
+    const nextGameNumber    = gameCompleted ? gameNumber + 1 : gameNumber
 
     await db.points.add({
       matchId,
@@ -83,6 +120,7 @@ export default function LiveCapture() {
       resultado:           result.id,
       equipo_ganador:      scoringTeam,
       marcador_resultante: score.gamePoints,
+      gameNumber:          currentGameNumber,
       nota:                '',
       revisar:             false,
     })
@@ -100,6 +138,7 @@ export default function LiveCapture() {
     setSelectedPlayer(null)
     setSelectedShot(null)
     setPhase('player')
+    if (gameCompleted) setGameNumber(nextGameNumber)
     if (isFinished) setFinished(true)
   }
 
@@ -109,7 +148,13 @@ export default function LiveCapture() {
     const newHistory = historyArr.slice(0, -1)
 
     const lastPt = await db.points.where('matchId').equals(matchId).last()
-    if (lastPt) await db.points.delete(lastPt.id)
+    if (lastPt) {
+      // Si deshacemos y el punto tenía un gameNumber menor, volver atrás
+      if (lastPt.gameNumber !== undefined && lastPt.gameNumber < gameNumber) {
+        setGameNumber(lastPt.gameNumber)
+      }
+      await db.points.delete(lastPt.id)
+    }
 
     await db.matches.update(matchId, {
       matchState: serializeState(prev),
@@ -145,6 +190,37 @@ export default function LiveCapture() {
 
   return (
     <div className={styles.page}>
+      {/* Modal: selección de equipo sacador */}
+      {showSacadorModal && (
+        <div className={styles.sacadorOverlay}>
+          <div className={styles.sacadorModal}>
+            <div className={styles.sacadorIcon}>🎾</div>
+            <h2 className={styles.sacadorTitle}>¿Quién saca primero?</h2>
+            <p className={styles.sacadorSub}>Esto permite calcular los Break Points correctamente</p>
+            <div className={styles.sacadorBtns}>
+              <button
+                className={[styles.sacadorBtn, styles.sacadorBtn1].join(' ')}
+                onClick={() => handleSelectSacador(1)}
+              >
+                <span className={styles.sacadorBtnLabel}>Equipo 1</span>
+                <span className={styles.sacadorBtnNames}>
+                  {match.equipo1.drive.nombre?.split(' ')[0]} / {match.equipo1.reves.nombre?.split(' ')[0]}
+                </span>
+              </button>
+              <button
+                className={[styles.sacadorBtn, styles.sacadorBtn2].join(' ')}
+                onClick={() => handleSelectSacador(2)}
+              >
+                <span className={styles.sacadorBtnLabel}>Equipo 2</span>
+                <span className={styles.sacadorBtnNames}>
+                  {match.equipo2.drive.nombre?.split(' ')[0]} / {match.equipo2.reves.nombre?.split(' ')[0]}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Scoreboard — order matches court (top team on top row) */}
       <Scoreboard score={score} match={match} topTeam={topTeam} />
 

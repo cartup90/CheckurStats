@@ -10,6 +10,15 @@ db.version(1).stores({
   points:  '++id, gameId, setId, matchId, timestamp, jugadorId, tipo_golpe, resultado, equipo_ganador, marcador_resultante, nota, revisar'
 })
 
+// v2: equipoSacadorInicial en matches, gameNumber en points
+db.version(2).stores({
+  players: '++id, nombre, apodo, club, createdAt',
+  matches: '++id, fecha, estado, equipo1, equipo2, formato, currentSet, currentGame, equipoSacadorInicial, createdAt',
+  sets:    '++id, matchId, numero, games_t1, games_t2, tiebreak',
+  games:   '++id, setId, matchId, numero, puntos_t1, puntos_t2, winner_team',
+  points:  '++id, gameId, setId, matchId, timestamp, jugadorId, tipo_golpe, resultado, equipo_ganador, marcador_resultante, gameNumber, nota, revisar'
+})
+
 // Helper: get all data for a match in one call
 export async function getMatchFull(matchId) {
   const id = Number(matchId)

@@ -104,6 +104,14 @@
 .kpiNum { font-size: var(--text-2xl); font-weight: 900; line-height: 1.1; }
 .kpiLabel { font-size: 0.6rem; color: var(--color-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
 
+.efectividadNote {
+  font-size: 0.6rem;
+  color: var(--color-text-3);
+  text-align: center;
+  margin: -8px 0 0;
+  font-style: italic;
+}
+
 /* Modal section */
 .modalSection { display: flex; flex-direction: column; gap: var(--space-3); }
 .sectionTitle { font-size: var(--text-sm); font-weight: 700; color: var(--color-text-2); margin: 0; }
@@ -160,7 +168,6 @@
 /* ── Page ───────────────────────────────────────────── */
 .page { display: flex; flex-direction: column; min-height: 100dvh; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
 
-
 .header {
   display: flex;
   align-items: center;
@@ -179,21 +186,24 @@
 .exportBtn { margin-left: auto; font-size: 1.3rem; padding: var(--space-2); min-width: 40px; min-height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); color: var(--color-text-2); }
 .exportBtn:active { background: var(--color-surface-2); }
 
-/* Tabs */
+/* Tabs — 4 tabs ahora, letra más pequeña */
 .tabs {
   display: flex;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
 }
 
 .tabBtn {
   flex: 1;
-  padding: var(--space-3);
-  font-size: var(--text-sm);
-  font-weight: 600;
+  padding: var(--space-3) var(--space-2);
+  font-size: 0.7rem;
+  font-weight: 700;
   color: var(--color-text-3);
   border-bottom: 2px solid transparent;
   transition: all var(--transition-fast);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .tabActive {
@@ -202,28 +212,341 @@
 }
 
 .main { flex: 1; overflow-y: auto; }
-
 .content { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-4); }
 
-/* Summary cards */
-.summaryCards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
-
-.summaryCard {
+/* ── VS Header ───────────────────────────────────────── */
+.vsHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.vsTeam {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.vsScore {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.vsName {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-2);
   text-align: center;
 }
 
-.card1 { border-color: rgba(59,130,246,0.3); }
-.card2 { border-color: rgba(245,158,11,0.3); }
+.vsCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
 
-.summaryNum { font-size: var(--text-2xl); font-weight: 900; }
-.summaryLabel { font-size: 0.6rem; color: var(--color-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vsBadge {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: var(--color-text-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  letter-spacing: 0.1em;
+}
 
-.card1 .summaryNum { color: var(--color-team1); }
-.card2 .summaryNum { color: var(--color-team2); }
+.vsTotal {
+  font-size: 0.6rem;
+  color: var(--color-text-3);
+  font-weight: 600;
+}
+
+/* ── Tabla comparativa ───────────────────────────────── */
+.compCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.compHeader {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+}
+
+.compHeaderTeam {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.compHeaderTeam:last-child { text-align: right; }
+
+.compHeaderCenter {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--color-text-3);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.compRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  transition: background var(--transition-fast);
+}
+.compRow:last-child { border-bottom: none; }
+.compRowHighlight { background: rgba(255,255,255,0.02); }
+
+.compVal {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-text-2);
+  transition: color var(--transition-fast);
+}
+.compVal:last-child { text-align: right; }
+.compWin { color: var(--color-accent) !important; }
+
+.compLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-3);
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 var(--space-2);
+}
+
+/* ── BP Warning ──────────────────────────────────────── */
+.bpWarning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-xs);
+  color: #f59e0b;
+  text-align: center;
+}
+
+.bpWarningLarge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+.bpWarningIcon { font-size: 3rem; }
+.bpWarningTitle { font-size: var(--text-lg); font-weight: 800; color: #f59e0b; }
+.bpWarningText { font-size: var(--text-sm); color: var(--color-text-3); max-width: 280px; }
+
+/* ── Break Point cards ───────────────────────────────── */
+.bpCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.bpCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  border-top-width: 3px;
+}
+
+.bpCard1 { border-top-color: #3b82f6; }
+.bpCard2 { border-top-color: #f59e0b; }
+
+.bpCardTeam {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-3);
+}
+
+.bpCardName {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-2);
+  text-align: center;
+}
+
+.bpCardMain {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: var(--space-2) 0;
+}
+
+.bpCardConverted {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  line-height: 1;
+}
+
+.bpCardSlash {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--color-text-3);
+}
+
+.bpCardTotal {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-2);
+}
+
+.bpCardPct {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.bpCardFailed {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+}
+
+/* ── Puntos de Oro ───────────────────────────────────── */
+.goldCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.goldCard {
+  background: var(--color-surface-2);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.goldIcon { font-size: 1.5rem; }
+.goldNum  { font-size: 2rem; font-weight: 900; color: #fbbf24; }
+.goldLabel { font-size: 0.65rem; color: var(--color-text-2); font-weight: 600; text-align: center; }
+
+.goldNote {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+  text-align: center;
+}
+
+/* ── Filtro de posición ──────────────────────────────── */
+.posFilterRow {
+  display: flex;
+  gap: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 4px;
+}
+
+.posFilterBtn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-3);
+  transition: all var(--transition-fast);
+}
+
+.posFilterActive {
+  background: var(--color-accent);
+  color: #000;
+}
+
+/* ── Tabla comparativa de golpes ─────────────────────── */
+.shotCompTable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.shotCompHeader {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-3);
+  padding: 0 var(--space-2);
+}
+
+.shotCompBlock {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.shotCompName {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(255,255,255,0.03);
+}
+
+.shotCompRow {
+  display: flex;
+  align-items: center;
+}
+
+.shotCompSide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2);
+  font-size: 0.65rem;
+}
+
+.shotCompTotal { font-size: var(--text-base); font-weight: 800; color: var(--color-text); }
+.shotCompPct { font-weight: 700; color: var(--color-accent); font-size: 0.7rem; }
+
+.shotCompDivider {
+  width: 1px;
+  background: var(--color-border);
+  align-self: stretch;
+}
 
 /* Chart card */
 .chartCard {
@@ -235,7 +558,7 @@
 
 .chartCard h3 { font-size: var(--text-sm); font-weight: 700; margin-bottom: var(--space-3); color: var(--color-text-2); }
 
-/* Shot table */
+/* Shot table (tab Golpes antiguo - mantenido por si acaso) */
 .shotTable {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -277,7 +600,6 @@
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   border-left-width: 3px;
-  /* reset button */
   width: 100%;
   text-align: left;
   cursor: pointer;
@@ -303,9 +625,6 @@
   color: #000;
   flex-shrink: 0;
 }
-
-.avatar1 { background: var(--color-team1); }
-.avatar2 { background: var(--color-team2); }
 
 .playerStatName { font-weight: 700; font-size: var(--text-base); }
 .playerStatSub { display: flex; align-items: center; gap: var(--space-2); margin-top: 2px; }
