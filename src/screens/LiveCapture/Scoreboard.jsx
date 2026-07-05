@@ -3,9 +3,10 @@ import styles from './Scoreboard.module.css'
 
 /**
  * topTeam: 1 | 2 — which team number appears at the TOP row of the scoreboard
- *                   (must match which team is at the top of the court)
+ * servingTeam: 1 | 2 | null — which team is currently serving
+ * onEditSacador: callback to open the serving team edit modal
  */
-export default function Scoreboard({ score, match, topTeam = 2 }) {
+export default function Scoreboard({ score, match, topTeam = 2, servingTeam = null, onEditSacador }) {
   if (!score || !match) return null
 
   const { pastSets, gamesT1, gamesT2, pointsT1, pointsT2, inTiebreak } = score
@@ -48,10 +49,17 @@ export default function Scoreboard({ score, match, topTeam = 2 }) {
   const topLeading    = top.rawPts    > bottom.rawPts
   const bottomLeading = bottom.rawPts > top.rawPts
 
+  const topServing    = servingTeam === topTeam
+  const bottomServing = servingTeam === bottomTeam
+
   return (
     <div className={styles.scoreboard}>
       {/* TOP TEAM ROW */}
       <div className={[styles.row, styles[`team${topTeam}`]].join(' ')}>
+        {/* Serving ball indicator */}
+        <span className={[styles.serveBall, topServing ? styles.serveBallActive : ''].join(' ')}>
+          {topServing ? '🎾' : ''}
+        </span>
         <span className={styles.teamName}>{top.name}</span>
 
         {/* Past set games */}
@@ -72,6 +80,10 @@ export default function Scoreboard({ score, match, topTeam = 2 }) {
 
       {/* BOTTOM TEAM ROW */}
       <div className={[styles.row, styles[`team${bottomTeam}`]].join(' ')}>
+        {/* Serving ball indicator */}
+        <span className={[styles.serveBall, bottomServing ? styles.serveBallActive : ''].join(' ')}>
+          {bottomServing ? '🎾' : ''}
+        </span>
         <span className={styles.teamName}>{bottom.name}</span>
 
         {pastSetsDisplay.map((s, i) => (
@@ -88,6 +100,20 @@ export default function Scoreboard({ score, match, topTeam = 2 }) {
       </div>
 
       {inTiebreak && <div className={styles.tbBadge}>TIE-BREAK</div>}
+
+      {/* Edit serving team button */}
+      {onEditSacador && (
+        <button
+          className={styles.editSacadorBtn}
+          onClick={onEditSacador}
+          title="Cambiar equipo sacador"
+          aria-label="Cambiar equipo sacador"
+        >
+          {servingTeam
+            ? `Saca Equipo ${servingTeam} · editar`
+            : '⚠ Sin sacador · definir'}
+        </button>
+      )}
     </div>
   )
 }

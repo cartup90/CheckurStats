@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import db from '../../db/database.js'
 import { createInitialState, serializeState } from '../../logic/scoring.js'
@@ -19,14 +19,18 @@ export default function NewMatch() {
   const [equipo1, setEquipo1] = useState({ drive: EMPTY_PLAYER, reves: EMPTY_PLAYER })
   const [equipo2, setEquipo2] = useState({ drive: EMPTY_PLAYER, reves: EMPTY_PLAYER })
   const [creating, setCreating] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState(null) // player id to confirm deletion
   const navigate = useNavigate()
 
-  useEffect(() => {
-    db.players.orderBy('nombre').toArray().then(setPlayers)
+  const reloadPlayers = useCallback(async () => {
+    const all = await db.players.orderBy('nombre').toArray()
+    setPlayers(all)
+    return all
   }, [])
 
-  function setPlayer(team, pos, playerId) {
-    const player = players.find(p => p.id === Number(playerId)) || EMPTY_PLAYER
+  useEffect(() => { reloadPlayers() }, [reloadPlayers])
+
+  function setPlayerOnTeam(team, pos, player) {
     if (team === 1) setEquipo1(e => ({ ...e, [pos]: player }))
     else            setEquipo2(e => ({ ...e, [pos]: player }))
   }
@@ -34,21 +38,44 @@ export default function NewMatch() {
   function setFormato_(key, val) {
     setFormato(f => {
       const next = { ...f, [key]: val }
-      // starPoint y puntoDeOro son excluyentes
-      if (key === 'starPoint' && val)   next.puntoDeOro = false
-      if (key === 'puntoDeOro' && val)  next.starPoint  = false
+      if (key === 'starPoint'  && val) next.puntoDeOro = false
+      if (key === 'puntoDeOro' && val) next.starPoint  = false
       return next
     })
   }
 
-  async function createQuickPlayer(name, team, pos) {
-    if (!name.trim()) return
-    const id = await db.players.add({ nombre: name.trim(), apodo: '', club: '', createdAt: new Date().toISOString() })
-    const player = { id, nombre: name.trim() }
-    if (team === 1) setEquipo1(e => ({ ...e, [pos]: player }))
-    else            setEquipo2(e => ({ ...e, [pos]: player }))
-    const all = await db.players.orderBy('nombre').toArray()
-    setPlayers(all)
+  async function handleSelectOrCreate(team, pos, name) {
+    const trimmed = name.trim()
+    if (!trimmed) { setPlayerOnTeam(team, pos, EMPTY_PLAYER); return }
+
+    // Buscar coincidencia exacta (case-insensitive)
+    const all = await reloadPlayers()
+    const existing = all.find(p => p.nombre.toLowerCase() === trimmed.toLowerCase())
+
+    if (existing) {
+      setPlayerOnTeam(team, pos, { id: existing.id, nombre: existing.nombre })
+    } else {
+      // Crear nuevo jugador
+      const id = await db.players.add({
+        nombre: trimmed,
+        apodo: '',
+        club: '',
+        createdAt: new Date().toISOString(),
+      })
+      const newPlayer = { id, nombre: trimmed }
+      setPlayerOnTeam(team, pos, newPlayer)
+      await reloadPlayers()
+    }
+  }
+
+  async function handleDeletePlayer(playerId) {
+    // Clear from teams if selected
+    const clear = p => p.id === playerId ? EMPTY_PLAYER : p
+    setEquipo1(e => ({ drive: clear(e.drive), reves: clear(e.reves) }))
+    setEquipo2(e => ({ drive: clear(e.drive), reves: clear(e.reves) }))
+    await db.players.delete(playerId)
+    setDeleteConfirm(null)
+    await reloadPlayers()
   }
 
   const canStart =
@@ -63,7 +90,6 @@ export default function NewMatch() {
     setCreating(true)
     const matchConfig = { formato }
     const state = createInitialState(matchConfig)
-
     const matchId = await db.matches.add({
       fecha:      new Date().toISOString(),
       createdAt:  new Date().toISOString(),
@@ -78,6 +104,30 @@ export default function NewMatch() {
 
   return (
     <div className={styles.page}>
+      {/* Delete confirmation modal */}
+      {deleteConfirm && (() => {
+        const p = players.find(x => x.id === deleteConfirm)
+        return (
+          <div className={styles.deleteOverlay}>
+            <div className={styles.deleteModal}>
+              <div className={styles.deleteIcon}>🗑️</div>
+              <h3 className={styles.deleteTitle}>Eliminar jugador</h3>
+              <p className={styles.deleteSub}>
+                ¿Eliminar a <strong>{p?.nombre}</strong>? Esta acción no se puede deshacer.
+              </p>
+              <div className={styles.deleteBtns}>
+                <button className={styles.deleteCancelBtn} onClick={() => setDeleteConfirm(null)}>
+                  Cancelar
+                </button>
+                <button className={styles.deleteConfirmBtn} onClick={() => handleDeletePlayer(deleteConfirm)}>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
       <header className={styles.header}>
         <button className={styles.back} onClick={() => navigate('/')}>←</button>
         <h1>Nuevo partido</h1>
@@ -94,8 +144,8 @@ export default function NewMatch() {
               teamColor="team1"
               team={equipo1}
               players={players}
-              setPlayer={(pos, id) => setPlayer(1, pos, id)}
-              onQuickCreate={(name, pos) => createQuickPlayer(name, 1, pos)}
+              onSelectOrCreate={(pos, name) => handleSelectOrCreate(1, pos, name)}
+              onDeleteRequest={id => setDeleteConfirm(id)}
             />
             <div className={styles.vsDivider}>VS</div>
             <TeamSetup
@@ -103,8 +153,8 @@ export default function NewMatch() {
               teamColor="team2"
               team={equipo2}
               players={players}
-              setPlayer={(pos, id) => setPlayer(2, pos, id)}
-              onQuickCreate={(name, pos) => createQuickPlayer(name, 2, pos)}
+              onSelectOrCreate={(pos, name) => handleSelectOrCreate(2, pos, name)}
+              onDeleteRequest={id => setDeleteConfirm(id)}
             />
           </div>
         </section>
@@ -120,7 +170,7 @@ export default function NewMatch() {
                   <button
                     key={n}
                     className={[styles.seg, formato.cantSets === n ? styles.segActive : ''].join(' ')}
-                    onClick={() => setFormato_(  'cantSets', n)}
+                    onClick={() => setFormato_('cantSets', n)}
                   >{n}</button>
                 ))}
               </div>
@@ -181,63 +231,181 @@ export default function NewMatch() {
   )
 }
 
-// Sub-component: team selector
-function TeamSetup({ label, teamColor, team, players, setPlayer, onQuickCreate }) {
-  const [quickDrive, setQuickDrive] = useState('')
-  const [quickReves, setQuickReves] = useState('')
+// ─── TeamSetup ───────────────────────────────────────────────────────────────
 
+function TeamSetup({ label, teamColor, team, players, onSelectOrCreate, onDeleteRequest }) {
   return (
     <div className={[styles.teamBox, styles[teamColor]].join(' ')}>
       <div className={styles.teamLabel}>{label}</div>
-
       <PlayerSelector
-        pos="drive"
         label="Drive (Derecha)"
-        value={team.drive.id}
+        selected={team.drive}
         players={players}
-        onChange={id => setPlayer('drive', id)}
-        quickValue={quickDrive}
-        onQuickChange={setQuickDrive}
-        onQuickCreate={() => { onQuickCreate(quickDrive, 'drive'); setQuickDrive('') }}
+        onCommit={name => onSelectOrCreate('drive', name)}
+        onDeleteRequest={onDeleteRequest}
       />
       <PlayerSelector
-        pos="reves"
         label="Revés (Izquierda)"
-        value={team.reves.id}
+        selected={team.reves}
         players={players}
-        onChange={id => setPlayer('reves', id)}
-        quickValue={quickReves}
-        onQuickChange={setQuickReves}
-        onQuickCreate={() => { onQuickCreate(quickReves, 'reves'); setQuickReves('') }}
+        onCommit={name => onSelectOrCreate('reves', name)}
+        onDeleteRequest={onDeleteRequest}
       />
     </div>
   )
 }
 
-function PlayerSelector({ label, value, players, onChange, quickValue, onQuickChange, onQuickCreate }) {
+// ─── PlayerSelector (combobox con filtro + crear + eliminar) ─────────────────
+
+function PlayerSelector({ label, selected, players, onCommit, onDeleteRequest }) {
+  const [query, setQuery]       = useState('')
+  const [open, setOpen]         = useState(false)
+  const [focused, setFocused]   = useState(false)
+  const inputRef  = useRef(null)
+  const wrapRef   = useRef(null)
+
+  // Sync display when parent clears selection
+  useEffect(() => {
+    if (!selected.id) setQuery('')
+  }, [selected.id])
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handler(e) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        setOpen(false)
+        setFocused(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const trimmed = query.trim()
+
+  // Filter players: show matches for the current query
+  const filtered = trimmed
+    ? players.filter(p => p.nombre.toLowerCase().includes(trimmed.toLowerCase()))
+    : players
+
+  // Exact match (case-insensitive)
+  const exactMatch = players.find(p => p.nombre.toLowerCase() === trimmed.toLowerCase())
+
+  // Show "create" option only when there's text and no exact match
+  const showCreate = trimmed.length > 0 && !exactMatch
+
+  const isSelected = !!selected.id
+
+  function handleInputChange(e) {
+    setQuery(e.target.value)
+    setOpen(true)
+    // If they clear the input, clear the selection too
+    if (!e.target.value.trim()) onCommit('')
+  }
+
+  function handleSelectPlayer(player) {
+    setQuery(player.nombre)
+    setOpen(false)
+    onCommit(player.nombre)
+  }
+
+  function handleCreate() {
+    if (!trimmed) return
+    setOpen(false)
+    onCommit(trimmed)
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (exactMatch) { handleSelectPlayer(exactMatch) }
+      else if (showCreate) { handleCreate() }
+    }
+    if (e.key === 'Escape') { setOpen(false); inputRef.current?.blur() }
+  }
+
+  function handleFocus() {
+    setFocused(true)
+    setOpen(true)
+  }
+
   return (
-    <div className={styles.playerSelector}>
+    <div className={styles.playerSelector} ref={wrapRef}>
       <div className={styles.posLabel}>{label}</div>
-      <select value={value || ''} onChange={e => onChange(e.target.value)}>
-        <option value="">— Seleccionar —</option>
-        {players.map(p => (
-          <option key={p.id} value={p.id}>{p.nombre}{p.apodo ? ` (${p.apodo})` : ''}</option>
-        ))}
-      </select>
-      <div className={styles.quickRow}>
+
+      <div className={[styles.comboWrap, isSelected ? styles.comboSelected : '', focused ? styles.comboFocused : ''].join(' ')}>
+        {isSelected && (
+          <span className={styles.comboCheck}>✓</span>
+        )}
         <input
-          placeholder="O escribí un nombre nuevo…"
-          value={quickValue}
-          onChange={e => onQuickChange(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && quickValue.trim() && onQuickCreate()}
+          ref={inputRef}
+          className={styles.comboInput}
+          type="text"
+          placeholder="Escribí para buscar o crear…"
+          value={query}
+          onChange={handleInputChange}
+          onFocus={handleFocus}
+          onKeyDown={handleKeyDown}
+          autoComplete="off"
+          spellCheck={false}
         />
-        {quickValue.trim() && (
-          <button className={styles.quickBtn} onClick={onQuickCreate}>+ Crear</button>
+        {query && (
+          <button
+            className={styles.comboClear}
+            onMouseDown={e => e.preventDefault()}
+            onClick={() => { setQuery(''); onCommit(''); inputRef.current?.focus() }}
+            tabIndex={-1}
+            aria-label="Limpiar"
+          >✕</button>
         )}
       </div>
+
+      {/* Dropdown */}
+      {open && (filtered.length > 0 || showCreate) && (
+        <div className={styles.dropdown}>
+          {filtered.length > 0 && (
+            <div className={styles.dropdownSection}>
+              {filtered.map(p => (
+                <div
+                  key={p.id}
+                  className={[styles.dropdownItem, selected.id === p.id ? styles.dropdownItemActive : ''].join(' ')}
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => handleSelectPlayer(p)}
+                >
+                  <span className={styles.dropdownName}>{p.nombre}</span>
+                  <button
+                    className={styles.dropdownDelete}
+                    onMouseDown={e => e.stopPropagation()}
+                    onClick={e => {
+                      e.stopPropagation()
+                      setOpen(false)
+                      onDeleteRequest(p.id)
+                    }}
+                    tabIndex={-1}
+                    aria-label={`Eliminar ${p.nombre}`}
+                  >🗑</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {showCreate && (
+            <div
+              className={styles.dropdownCreate}
+              onMouseDown={e => e.preventDefault()}
+              onClick={handleCreate}
+            >
+              <span className={styles.dropdownCreateIcon}>＋</span>
+              <span>Crear <strong>"{trimmed}"</strong></span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
+
+// ─── Toggle ──────────────────────────────────────────────────────────────────
 
 function Toggle({ value, onChange }) {
   return (

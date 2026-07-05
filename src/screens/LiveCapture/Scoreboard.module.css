@@ -22,6 +22,30 @@
 .row.team1 .teamName { color: var(--color-team1); }
 .row.team2 .teamName { color: var(--color-team2); }
 
+/* Serve ball slot — fixed width so layout never shifts */
+.serveBall {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition: transform 200ms cubic-bezier(0.34,1.56,0.64,1), opacity 200ms;
+  opacity: 0;
+}
+
+.serveBallActive {
+  opacity: 1;
+  animation: ballPop 300ms cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes ballPop {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
 .teamName {
   flex: 1;
   font-size: var(--text-xs);
@@ -88,4 +112,24 @@
   color: var(--color-accent);
   letter-spacing: 0.1em;
   margin-top: 2px;
+}
+
+/* Edit server button */
+.editSacadorBtn {
+  align-self: center;
+  margin-top: 2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-3);
+  background: transparent;
+  border: none;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: color 150ms, background 150ms;
+}
+.editSacadorBtn:hover {
+  color: var(--color-accent);
+  background: var(--color-accent-glow);
 }
